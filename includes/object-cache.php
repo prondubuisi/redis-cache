@@ -1134,9 +1134,14 @@ LUA;
 
         $cache = array();
 
+        //Assumption for when group is ignored 
         if ( $this->is_ignored_group( $group ) || ! $this->redis_status() ) {
             foreach ( $keys as $key ) {
-                $cache[ $key ] = $this->get( $key, $group, $force );
+                $derived_key[] = $this->build_key( $key, $group);
+                //get from internal cache
+                $cache[ $key ] = $this->get_from_internal_cache( $derived_key, $group);
+                //increment stats
+                $this->increment($key);
             }
 
             return $cache;
